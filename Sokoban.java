@@ -107,19 +107,6 @@ public class Sokoban {
             "#   $ $  #",
             "#       @#",
             "##########"
-        },
-        {
-            "    #####",
-            "    #   #",
-            "    #$  #",
-            "  ###  $##",
-            "  #  $ $ #",
-            "### # ## #   ######",
-            "#   # ## #####  ..#",
-            "# $  $          ..#",
-            "##### ### #@##  ..#",
-            "    #     #########",
-            "    #######"
         }
     };
 
@@ -138,7 +125,8 @@ public class Sokoban {
         while (enCours) {
             int choix = menuPrincipal();
             if (choix == 1) {
-                jouerCampagne();
+                chargerNiveau(0);
+                jouer();
             } else if (choix == 2) {
                 menuNiveaux();
             } else {
@@ -202,19 +190,6 @@ public class Sokoban {
         } catch (NumberFormatException e) {
         }
         return -1;
-    }
-
-    static void jouerCampagne() {
-        for (int i = 0; i < NIVEAUX.length; i++) {
-            chargerNiveau(i);
-            System.out.println();
-            System.out.println("--- Niveau " + (i + 1) + " / " + NIVEAUX.length + " ---");
-            if (!jouer()) {
-                return;
-            }
-        }
-        System.out.println();
-        System.out.println("Felicitations, tous les niveaux sont termines !");
     }
 
     static void chargerNiveau(int indice) {
@@ -328,7 +303,7 @@ public class Sokoban {
         return true;
     }
 
-    static boolean jouer() {
+    static void jouer() {
         while (true) {
             System.out.println();
             afficherGrille();
@@ -338,7 +313,7 @@ public class Sokoban {
                 System.out.println();
                 System.out.println("Victoire !");
                 System.out.println("Nombre de mouvements : " + nbMouvements);
-                return true;
+                return;
             }
 
             System.out.print("Commande (z/s/q/d, x=quitter) : ");
@@ -352,7 +327,7 @@ public class Sokoban {
 
             if (commande == 'x') {
                 System.out.println("Partie abandonnee.");
-                return false;
+                return;
             }
 
             int dir = -1;
