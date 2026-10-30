@@ -15,14 +15,112 @@ public class Sokoban {
     static final int[]    DC       = {   0,     0,    -1,        1       };
     static final String[] NOMS_DIR = { "haut", "bas", "gauche", "droite" };
 
-    static final String[] NIVEAU = {
-        "########",
-        "#      #",
-        "#  .   #",
-        "#  $   #",
-        "#  @   #",
-        "#      #",
-        "########"
+    static final String[][] NIVEAUX = {
+        {
+            "########",
+            "#      #",
+            "#  .   #",
+            "#  $   #",
+            "#  @   #",
+            "#      #",
+            "########"
+        },
+        {
+            "#######",
+            "#     #",
+            "#  $  #",
+            "#  .  #",
+            "#  @  #",
+            "#     #",
+            "#######"
+        },
+        {
+            "########",
+            "#      #",
+            "#  $$  #",
+            "#  ..  #",
+            "#  @   #",
+            "#      #",
+            "########"
+        },
+        {
+            "########",
+            "#      #",
+            "#  .$  #",
+            "#      #",
+            "#  $.  #",
+            "#  @   #",
+            "########"
+        },
+        {
+            "##########",
+            "#        #",
+            "#  $  $  #",
+            "#  .  .  #",
+            "#        #",
+            "#  .  .  #",
+            "#  $  $  #",
+            "#   @    #",
+            "##########"
+        },
+        {
+            "#######",
+            "#  .  #",
+            "# $*$ #",
+            "#  +  #",
+            "#  $  #",
+            "#  .  #",
+            "#######"
+        },
+        {
+            "#########",
+            "#       #",
+            "#  ###  #",
+            "#  $ $  #",
+            "#  . .  #",
+            "#   @   #",
+            "#########"
+        },
+        {
+            "##########",
+            "#  #     #",
+            "#  #  .  #",
+            "#  $     #",
+            "#  @  .  #",
+            "#  $     #",
+            "#  #     #",
+            "##########"
+        },
+        {
+            "#########",
+            "#.      #",
+            "#.      #",
+            "#. $$$  #",
+            "#   @   #",
+            "#########"
+        },
+        {
+            "##########",
+            "#..#     #",
+            "#.. $ $  #",
+            "#        #",
+            "#   $ $  #",
+            "#       @#",
+            "##########"
+        },
+        {
+            "    #####",
+            "    #   #",
+            "    #$  #",
+            "  ###  $##",
+            "  #  $ $ #",
+            "### # ## #   ######",
+            "#   # ## #####  ..#",
+            "# $  $          ..#",
+            "##### ### #@##  ..#",
+            "    #     #########",
+            "    #######"
+        }
     };
 
     static boolean[][] mur;
@@ -36,16 +134,97 @@ public class Sokoban {
     static final Scanner clavier = new Scanner(System.in);
 
     public static void main(String[] args) {
-        chargerNiveau();
-        jouer();
+        boolean enCours = true;
+        while (enCours) {
+            int choix = menuPrincipal();
+            if (choix == 1) {
+                jouerCampagne();
+            } else if (choix == 2) {
+                menuNiveaux();
+            } else {
+                enCours = false;
+            }
+        }
+        System.out.println("Au revoir !");
     }
 
-    static void chargerNiveau() {
-        hauteur = NIVEAU.length;
+    static int menuPrincipal() {
+        while (true) {
+            System.out.println();
+            System.out.println("===== SOKOBAN =====");
+            System.out.println("1. Jouer");
+            System.out.println("2. Choix du niveau");
+            System.out.println("3. Quitter");
+            System.out.print("Votre choix : ");
+
+            int choix = lireChoix(3);
+            if (choix != -1) {
+                return choix;
+            }
+            System.out.println("Choix invalide.");
+        }
+    }
+
+    static void menuNiveaux() {
+        while (true) {
+            System.out.println();
+            System.out.println("===== CHOIX DU NIVEAU =====");
+            for (int i = 0; i < NIVEAUX.length; i++) {
+                System.out.println((i + 1) + ". Niveau " + (i + 1));
+            }
+            System.out.println((NIVEAUX.length + 1) + ". Retour");
+            System.out.print("Votre choix : ");
+
+            int choix = lireChoix(NIVEAUX.length + 1);
+            if (choix == -1) {
+                System.out.println("Choix invalide.");
+            } else if (choix == NIVEAUX.length + 1) {
+                return;
+            } else {
+                chargerNiveau(choix - 1);
+                jouer();
+                return;
+            }
+        }
+    }
+
+    static int lireChoix(int max) {
+        String saisie = clavier.hasNextLine() ? clavier.nextLine().trim() : "";
+        if (saisie.isEmpty()) {
+            return max;
+        }
+
+        try {
+            int choix = Integer.parseInt(saisie);
+            if (choix >= 1 && choix <= max) {
+                return choix;
+            }
+        } catch (NumberFormatException e) {
+        }
+        return -1;
+    }
+
+    static void jouerCampagne() {
+        for (int i = 0; i < NIVEAUX.length; i++) {
+            chargerNiveau(i);
+            System.out.println();
+            System.out.println("--- Niveau " + (i + 1) + " / " + NIVEAUX.length + " ---");
+            if (!jouer()) {
+                return;
+            }
+        }
+        System.out.println();
+        System.out.println("Felicitations, tous les niveaux sont termines !");
+    }
+
+    static void chargerNiveau(int indice) {
+        String[] plan = NIVEAUX[indice];
+
+        hauteur = plan.length;
         largeur = 0;
         for (int l = 0; l < hauteur; l++) {
-            if (NIVEAU[l].length() > largeur) {
-                largeur = NIVEAU[l].length();
+            if (plan[l].length() > largeur) {
+                largeur = plan[l].length();
             }
         }
 
@@ -59,7 +238,7 @@ public class Sokoban {
 
         for (int l = 0; l < hauteur; l++) {
             for (int c = 0; c < largeur; c++) {
-                char symbole = (c < NIVEAU[l].length()) ? NIVEAU[l].charAt(c) : LIBRE;
+                char symbole = (c < plan[l].length()) ? plan[l].charAt(c) : LIBRE;
 
                 if (symbole == MUR) {
                     mur[l][c] = true;
@@ -149,10 +328,8 @@ public class Sokoban {
         return true;
     }
 
-    static void jouer() {
-        boolean enCours = true;
-
-        while (enCours) {
+    static boolean jouer() {
+        while (true) {
             System.out.println();
             afficherGrille();
             System.out.println("Mouvements : " + nbMouvements);
@@ -161,7 +338,7 @@ public class Sokoban {
                 System.out.println();
                 System.out.println("Victoire !");
                 System.out.println("Nombre de mouvements : " + nbMouvements);
-                return;
+                return true;
             }
 
             System.out.print("Commande (z/s/q/d, x=quitter) : ");
@@ -175,8 +352,7 @@ public class Sokoban {
 
             if (commande == 'x') {
                 System.out.println("Partie abandonnee.");
-                enCours = false;
-                continue;
+                return false;
             }
 
             int dir = -1;
